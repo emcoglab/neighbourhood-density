@@ -1,0 +1,2 @@
+-r ldm/requirements.txt
+xlrd >= 1.0.0
