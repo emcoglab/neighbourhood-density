@@ -1,13 +1,11 @@
 import logging
-from os import path
 from sys import argv
 
 from numpy import mean, array, squeeze
-from pandas import DataFrame
 
-from aux import LDD_N, load_word_list
+from aux import LDD_N, load_word_list, WORD_RANK_FREQ_THRESHOLD, save_files
 from ldm.corpus.indexing import FreqDist
-from ldm.model.ngram import LogNgramModel, PPMINgramModel
+from ldm.model.ngram import PPMINgramModel
 from ldm.preferences.preferences import Preferences as LDMPreferences
 
 logger = logging.getLogger(__name__)
@@ -18,7 +16,6 @@ def main():
     freq_dist = FreqDist.load(corpus.freq_dist_path)
 
     models = [
-        LogNgramModel(corpus_meta=corpus, window_radius=5, freq_dist=freq_dist),
         PPMINgramModel(corpus_meta=corpus, window_radius=5, freq_dist=freq_dist)
     ]
 
@@ -46,7 +43,12 @@ def ldd_from_model(model):
             not_found.append(word)
             continue
 
-        similarities = squeeze(array(similarity_matrix[idx, :].todense()))
+        ocmf = WORD_RANK_FREQ_THRESHOLD
+        if ocmf is not None:
+            similarities = squeeze(array(similarity_matrix[idx, :WORD_RANK_FREQ_THRESHOLD].todense()))
+        else:
+            similarities = squeeze(array(similarity_matrix[idx, :].todense()))
+
         # Convert similarities to distances by subtracting from the max value
         distances = max_similarity - similarities
 
@@ -69,17 +71,8 @@ def ldd_from_model(model):
 
         if word_count % 100 == 0:
             logger.info(f"Done {word_count:,}/{len(wordlist):,} ({100 * word_count / len(wordlist):.2f}%)")
-    # Save LDD file
-    DataFrame(ldds, columns=["Word", f"LDD{LDD_N}"]).to_csv(
-        path.join("/Users/caiwingfield/Desktop/", f"{model.name} LDD{LDD_N}.csv"), index=False)
-    # Save neighbours file
-    DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, LDD_N + 1)]).to_csv(
-        path.join("/Users/caiwingfield/Desktop/", f"{model.name} neighbours.csv"), index=False)
-    # Save not-found list
-    with open(path.join("/Users/caiwingfield/Desktop/", f"{model.name} not found.txt"), mode="w",
-              encoding="utf-8") as not_found_file:
-        for w in not_found:
-            not_found_file.write(f"{w}\n")
+
+    save_files(ldds, model, nearest_words, not_found)
 
 
 if __name__ == '__main__':
