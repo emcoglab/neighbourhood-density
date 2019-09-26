@@ -1,5 +1,6 @@
 import logging
 from sys import argv
+from typing import Tuple
 
 from numpy import mean, array
 
@@ -47,16 +48,19 @@ def ldd_from_model(model: CountVectorModel, distance_type: DistanceType):
             not_found.append(word)
             continue
 
-        distances = array([d for n, d in neighbours_with_distances])
+        neighbours: Tuple[str] = tuple(n for n, d in neighbours_with_distances)
+        distances: array = array([d for n, d in neighbours_with_distances])
 
         ldd = mean(distances)
 
         ldds.append((word, ldd))
 
+        nearest_words.append((word, *neighbours))
+
         if word_count % 100 == 0:
             logger.info(f"Done {word_count:,}/{len(wordlist):,} ({100 * word_count / len(wordlist):.2f}%)")
 
-    save_files(ldds, model, nearest_words, not_found)
+    save_files(ldds, model, nearest_words, not_found, distance_type)
 
 
 if __name__ == '__main__':

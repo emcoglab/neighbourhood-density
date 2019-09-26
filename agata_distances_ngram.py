@@ -43,9 +43,9 @@ def ldd_from_model(model):
             not_found.append(word)
             continue
 
-        ocmf = WORD_RANK_FREQ_THRESHOLD
-        if ocmf is not None:
-            similarities = squeeze(array(similarity_matrix[idx, :WORD_RANK_FREQ_THRESHOLD].todense()))
+        only_consider_most_frequent = WORD_RANK_FREQ_THRESHOLD
+        if only_consider_most_frequent is not None:
+            similarities = squeeze(array(similarity_matrix[idx, :only_consider_most_frequent].todense()))
         else:
             similarities = squeeze(array(similarity_matrix[idx, :].todense()))
 
@@ -72,7 +72,7 @@ def ldd_from_model(model):
         if word_count % 100 == 0:
             logger.info(f"Done {word_count:,}/{len(wordlist):,} ({100 * word_count / len(wordlist):.2f}%)")
 
-    save_files(ldds, model, nearest_words, not_found)
+    save_files(ldds, model, nearest_words, not_found, None)
 
 
 if __name__ == '__main__':
