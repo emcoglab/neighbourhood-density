@@ -14,7 +14,9 @@ SAVE_DIR = "/Users/caiwingfield/Desktop/"
 def load_word_list() -> List[str]:
     wordlist_path = path.join(path.dirname(__file__), "words for linguistic distance_Agata.xlsx")
     with open(wordlist_path, mode="rb") as wordlist_file:
-        wordlist_df = read_excel(wordlist_file)
+        wordlist_df = read_excel(wordlist_file,
+                                 # to avoid problems with "null"
+                                 convert_float=False, dtype=str, na_values=dict(), keep_default_na=False)
     wordlist = list(wordlist_df['Word'])
     return [w.lower().strip() for w in wordlist]
 
