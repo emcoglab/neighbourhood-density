@@ -1,3 +1,6 @@
 [submodule "ldm"]
 	path = ldm
 	url = git@github.com:emcoglab/ldm-core.git
+[submodule "sm"]
+	path = sm
+	url = git@github.com:emcoglab/sensorimotor-norms.git

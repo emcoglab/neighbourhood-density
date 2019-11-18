@@ -1,2 +1,6 @@
 -r ldm/requirements.txt
+-r sm/requirements.txt
+numpy
+pandas
+scipy
 xlrd >= 1.0.0
