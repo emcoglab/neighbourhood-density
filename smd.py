@@ -84,10 +84,11 @@ def save_files(smds, nearest_words, not_found, distance: Optional[DistanceType])
         path.join(SAVE_DIR, f"{distance.name} neighbours.csv"), index=False)
 
     # Save not-found list
-    with open(path.join(SAVE_DIR, f"{distance.name} not found.txt"), mode="w",
-              encoding="utf-8") as not_found_file:
-        for w in not_found:
-            not_found_file.write(f"{w}\n")
+    if len(not_found) > 0:
+        with open(path.join(SAVE_DIR, f"{distance.name} not found.txt"), mode="w",
+                  encoding="utf-8") as not_found_file:
+            for w in not_found:
+                not_found_file.write(f"{w}\n")
 
 
 def main(distance_type: DistanceType):
