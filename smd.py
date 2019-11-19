@@ -25,16 +25,17 @@ class SensorimotorNormsDistances(SensorimotorNorms):
     def _distances_for_word(self, word: str, distance_type: DistanceType) -> array:
         """Vector of distances from the specified word."""
         vector = self.vector_for_word(word)
+        # pairwise distances functions require a matrix, not a vector
+        vector = reshape(vector, (1, len(vector)))
 
         if distance_type in [DistanceType.cosine, DistanceType.Euclidean, DistanceType.correlation]:
-            return distance_matrix(vector, self.matrix(), metric=distance_type.name)
+            # squeeze to undo the inner reshape
+            return squeeze(
+                distance_matrix(vector, self.matrix(), metric=distance_type.name))
         elif distance_type == DistanceType.Minkowski3:
             # squeeze to undo the inner reshape
             return squeeze(
-                minkowski_distance_matrix(
-                    # minkowski_distance_matrix requires a matrix, not a vector
-                    reshape(vector, (1, len(vector))),
-                    self.matrix(), 3))
+                minkowski_distance_matrix(vector, self.matrix(), 3))
         else:
             raise NotImplementedError()
 
@@ -88,13 +89,11 @@ def save_files(smds, nearest_words, not_found, distance: Optional[DistanceType])
             not_found_file.write(f"{w}\n")
 
 
-def main():
+def main(distance_type: DistanceType):
 
     sm = SensorimotorNormsDistances()
 
     wordlist = list(sm.iter_words())
-
-    distance_type = DistanceType.Minkowski3
 
     smds = []
     nearest_words = []
@@ -130,5 +129,6 @@ if __name__ == '__main__':
                         datefmt="%Y-%m-%d %H:%M:%S",
                         level=logging.INFO)
     logger.info("Running %s" % " ".join(argv))
-    main()
+    for d in DistanceType:
+        main(d)
     logger.info("Done!")
