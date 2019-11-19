@@ -9,6 +9,7 @@ from scipy.spatial import distance_matrix as minkowski_distance_matrix
 from scipy.spatial.distance import cdist as distance_matrix
 
 from ldm.utils.lists import unzip
+from ldm.utils.logging import print_progress
 from ldm.utils.maths import DistanceType
 from sm.exceptions import WordNotInNormsError
 from sm.sensorimotor_norms import SensorimotorNorms
@@ -91,6 +92,8 @@ def save_files(smds, nearest_words, not_found, distance: Optional[DistanceType])
 
 def main(distance_type: DistanceType):
 
+    logger.info(f"Computing neighbourhood densities using {distance_type.name} distance")
+
     sm = SensorimotorNormsDistances()
 
     wordlist = list(sm.iter_words())
@@ -98,28 +101,22 @@ def main(distance_type: DistanceType):
     smds = []
     nearest_words = []
     not_found = []
-    for word_i, word in enumerate(wordlist):
+    for i, word in enumerate(wordlist, start=1):
+        print_progress(i, len(wordlist), bar_length=50)
+
         try:
-            neighbours_with_distances = sm.nearest_neighbours_with_distances(
-                word,
-                n=SMD_N,
-                distance_type=distance_type)
+            neighbours_with_distances = sm.nearest_neighbours_with_distances(word, n=SMD_N, distance_type=distance_type)
+
+            neighbours: Tuple[str]
+            distances: array
+            neighbours, distances = unzip(neighbours_with_distances)
+
+            smds.append((word, mean(distances)))
+            nearest_words.append((word, *neighbours))
+
         except WordNotInNormsError:
             not_found.append(word)
             continue
-
-        neighbours: Tuple[str]
-        distances: array
-        neighbours, distances = unzip(neighbours_with_distances)
-
-        smd = mean(distances)
-
-        smds.append((word, smd))
-
-        nearest_words.append((word, *neighbours))
-
-        if (word_i % 100 == 0) and (word_i > 0):
-            logger.info(f"Done {word_i:,}/{len(wordlist):,} ({100 * word_i / len(wordlist):.2f}%)")
 
     save_files(smds, nearest_words, not_found, distance_type)
 
