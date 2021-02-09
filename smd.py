@@ -82,22 +82,15 @@ def main():
 
     df: DataFrame = DataFrame(wordlist, columns=["Word"])
 
-    not_found = None
     for distance_type in DistanceType:
         logger.info(f"Computing neighbourhood densities using {distance_type.name} distance")
 
         smds: List[float] = []
         nearest_words: List[Tuple] = []
-        not_found: List[str] = []
         for i, word in enumerate(wordlist, start=1):
             print_progress(i, len(wordlist), bar_length=50)
 
-            try:
-                neighbours_with_distances = the_norms.nearest_neighbours_with_distances(word, n=SMD_N, distance_type=distance_type)
-
-            except WordNotInNormsError:
-                not_found.append(word)
-                continue
+            neighbours_with_distances = the_norms.nearest_neighbours_with_distances(word, n=SMD_N, distance_type=distance_type)
 
             neighbours: Tuple[str]
             distances: array
@@ -112,15 +105,8 @@ def main():
         DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, SMD_N + 1)]).to_csv(
             path.join(SAVE_DIR, f"{distance_type.name} neighbours.csv"), index=False)
 
-    # Save not-found list
-    not_found_path = Path(SAVE_DIR, "not found.txt")
-    with not_found_path.open(mode="w") as not_found_file:
-        assert not_found is not None
-        for w in not_found:
-            not_found_file.write(f"{w}\n")
-
     # Save SMD file
-    smd_path = Path(SAVE_DIR, f"smd{20}.csv")
+    smd_path = Path(SAVE_DIR, f"smd{SMD_N}.csv")
     with smd_path.open(mode="w") as smd_file:
         df.to_csv(smd_file, index=False)
 

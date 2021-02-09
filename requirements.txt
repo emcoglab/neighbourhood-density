@@ -3,4 +3,3 @@
 numpy
 pandas
 scipy
-xlrd >= 1.0.0
