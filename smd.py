@@ -9,6 +9,7 @@ from pandas import DataFrame
 from scipy.spatial import distance_matrix as minkowski_distance_matrix
 from scipy.spatial.distance import cdist as distance_matrix
 
+from constants import SAVE_DIR, SMD_N
 from ldm.utils.lists import unzip
 from ldm.utils.logging import print_progress
 from ldm.utils.maths import DistanceType
@@ -16,9 +17,6 @@ from sm.exceptions import WordNotInNormsError
 from sm.sensorimotor_norms import SensorimotorNorms
 
 logger = logging.getLogger(__name__)
-
-SMD_N = 20
-SAVE_DIR = "/Users/caiwingfield/Box Sync/LANGBOOT Project/Model/SMD20"
 
 
 class SensorimotorNormsDistances(SensorimotorNorms):

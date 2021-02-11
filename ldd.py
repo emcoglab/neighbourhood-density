@@ -7,16 +7,13 @@ from typing import Tuple, List
 from numpy import array, mean, squeeze
 from pandas import DataFrame
 
+from constants import LDD_WORDS, SAVE_DIR, LDD_N
 from ldm.corpus.indexing import FreqDist
 from ldm.model.ngram import PPMINgramModel
 from ldm.preferences.preferences import Preferences as LDMPreferences
 from ldm.utils.logging import print_progress
 
 logger = logging.getLogger(__name__)
-
-LDD_N = 20
-LDD_WORDS = 60_000
-SAVE_DIR = "/Users/caiwingfield/Box Sync/LANGBOOT Project/Model/LDD20"
 
 
 def main():
