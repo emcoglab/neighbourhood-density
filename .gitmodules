@@ -4,3 +4,6 @@
 [submodule "sm"]
 	path = sm
 	url = git@github.com:emcoglab/sensorimotor-norms.git
+[submodule "category_production"]
+	path = category_production
+	url = git@github.com:emcoglab/category_production.git
