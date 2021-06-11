@@ -7,6 +7,9 @@ from typing import Tuple, List
 from numpy import array, mean, squeeze
 from pandas import DataFrame
 
+from ldm.preferences.config import Config as LDMConfig
+LDMConfig(use_config_overrides_from_file=path.join(path.dirname(__file__), "wayland_config_override.yaml"))
+
 from constants import LDD_WORDS, SAVE_DIR, LDD_N
 from ldm.corpus.indexing import FreqDist
 from ldm.model.count import CountVectorModel, PPMIModel
