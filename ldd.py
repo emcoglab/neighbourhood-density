@@ -37,7 +37,7 @@ def ldds_from_ngram_model(model: NgramModel, wordlist):
     for i, word in enumerate(wordlist, start=1):
         print_progress(i, len(wordlist), bar_length=50, suffix=f" ({i:,}/{LDD_WORDS:,})")
         if i > 0 and i % 1_000 == 0:
-        	logger.info(f"Done {i:,} words")
+            logger.info(f"Done {i:,} words")
 
         idx = model.underlying_count_model.token_index.token2id[word]
 
@@ -69,13 +69,12 @@ def ldds_from_ngram_model(model: NgramModel, wordlist):
 
 def ldds_from_vector_model(model: CountVectorModel, distance_type: DistanceType, wordlist):
 
-    # drop zeros to ensure that min value is non-zero
     ldds = []
     nearest_words = []
     for i, word in enumerate(wordlist, start=1):
         print_progress(i, len(wordlist), bar_length=50, suffix=f" ({i:,}/{LDD_WORDS:,})")
         if i > 0 and i % 1_000 == 0:
-        	logger.info(f"Done {i:,} words")
+            logger.info(f"Done {i:,} words")
 
         neighbours_with_distances = model.nearest_neighbours_with_distances(word, distance_type=distance_type,
                                                                             n=LDD_N,
