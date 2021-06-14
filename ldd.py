@@ -33,6 +33,8 @@ def ldds_from_ngram_model(model: NgramModel, wordlist):
     nearest_words: List[Tuple] = []
     for i, word in enumerate(wordlist, start=1):
         print_progress(i, len(wordlist), bar_length=50, suffix=f" ({i:,}/{LDD_WORDS:,})")
+        if i > 0 and i % 1_000 == 0:
+            logger.info(f"Done {i:,} words")
 
         idx = model.underlying_count_model.token_index.token2id[word]
 
@@ -64,19 +66,22 @@ def ldds_from_ngram_model(model: NgramModel, wordlist):
 
 def ldds_from_vector_model(model: CountVectorModel, distance_type: DistanceType, wordlist):
 
-    # drop zeros to ensure that min value is non-zero
     ldds = []
     nearest_words = []
     for i, word in enumerate(wordlist, start=1):
         print_progress(i, len(wordlist), bar_length=50, suffix=f" ({i:,}/{LDD_WORDS:,})")
+        if i > 0 and i % 1_000 == 0:
+            logger.info(f"Done {i:,} words")
 
         neighbours_with_distances = model.nearest_neighbours_with_distances(word, distance_type=distance_type,
                                                                             n=LDD_N,
                                                                             only_consider_most_frequent=LDD_WORDS)
 
         distances = array([d for n, d in neighbours_with_distances])
+        neighbours = [n for n, d in neighbours_with_distances]
 
         ldds.append(mean(distances))
+        nearest_words.append((word, *neighbours))
 
     # Save neighbours file
     DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, LDD_N + 1)]).to_csv(
@@ -108,9 +113,12 @@ def main():
     model.train(memory_map=True)
 
     logger.info(f"Computing neighbourhood densities using {model.name}")
-    df[f"LDD{LDD_N} ({model.name})"] = ldds_from_vector_model(model, DistanceType.cosine, wordlist)
+    distance = DistanceType.cosine
+    df[f"LDD{LDD_N} ({model.name} {distance.name})"] = ldds_from_vector_model(model, distance, wordlist)
 
     model.untrain()
+    
+    df.sort_values(by=f"Frequency ({corpus.name})", ascending=False, inplace=True)
 
     # Save LDD file
     ldd_path = Path(SAVE_DIR, f"ldd{LDD_N}.csv")
