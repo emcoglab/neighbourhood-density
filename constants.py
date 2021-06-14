@@ -1,4 +1,4 @@
-SAVE_DIR = "/Users/caiwingfield/Box Sync/LANGBOOT Project/Model/SMD20 & LDD20"
+SAVE_DIR = "/mmfs1/scratch/hpc/57/wingfiel/neighbourhood_density"
 
 SMD_N = 20
 LDD_N = 20
