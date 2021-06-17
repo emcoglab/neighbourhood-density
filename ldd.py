@@ -61,8 +61,8 @@ def ldds_from_ngram_model(model: NgramModel, wordlist):
         nearest_words.append((word, *neighbours))
 
     # Save neighbours file
-    #DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, LDD_N + 1)]).to_csv(
-    #    path.join(SAVE_DIR, f"{model.name} neighbours.csv"), index=False)
+    DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, LDD_N + 1)]).to_csv(
+       path.join(SAVE_DIR, f"{model.name} neighbours.csv"), index=False)
 
     return ldds
 
@@ -87,8 +87,8 @@ def ldds_from_vector_model(model: CountVectorModel, distance_type: DistanceType,
         nearest_words.append((word, *neighbours))
 
     # Save neighbours file
-    #DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, LDD_N + 1)]).to_csv(
-    #    path.join(SAVE_DIR, f"{model.name} neighbours.csv"), index=False)
+    DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, LDD_N + 1)]).to_csv(
+       path.join(SAVE_DIR, f"{model.name} neighbours.csv"), index=False)
 
     return ldds
 
