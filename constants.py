@@ -1,6 +1,2 @@
-SAVE_DIR = "/Users/caiwingfield/Box Sync/LANGBOOT Project/Model/SMD20 & LDD20"
-
-SMD_N = 20
-LDD_N = 20
-
-LDD_WORDS = 60_000
+NBHD_SIZE_DEFAULT = 20  # The neighbourhood size if none is specified in the CLI
+LDD_WORDS = 60_000  # Adjust this downwards from 60_000 to save memory and use only the most-frequent words in the corpus

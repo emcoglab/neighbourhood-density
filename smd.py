@@ -1,22 +1,21 @@
 import logging
 from os import path
 from pathlib import Path
-from sys import argv
 from typing import Tuple, List
 
-from numpy import array, mean, reshape, squeeze
+from numpy import array, mean, reshape, squeeze, nan
 from pandas import DataFrame
 from scipy.spatial import distance_matrix as minkowski_distance_matrix
 from scipy.spatial.distance import cdist as distance_matrix
 
-from constants import SAVE_DIR, SMD_N
 from ldm.utils.lists import unzip
 from ldm.utils.logging import print_progress
 from ldm.utils.maths import DistanceType
 from sm.exceptions import WordNotInNormsError
 from sm.sensorimotor_norms import SensorimotorNorms
 
-logger = logging.getLogger(__name__)
+
+_logger = logging.getLogger(__name__)
 
 
 class SensorimotorNormsDistances(SensorimotorNorms):
@@ -73,46 +72,29 @@ class SensorimotorNormsDistances(SensorimotorNorms):
         return nearest_neighbours
 
 
-def main():
+def smds(wordlist: list[str], distance: DistanceType, neighbourhood_size: int) -> list[float]:
 
     the_norms = SensorimotorNormsDistances()
-    wordlist = list(the_norms.iter_words())
 
-    df: DataFrame = DataFrame(wordlist, columns=["Word"])
+    smds: list[float] = []
+    nearest_words: list[tuple[str, ...]] = []
+    for i, word in enumerate(wordlist, start=1):
+        print_progress(i, len(wordlist), bar_length=50)
 
-    for distance_type in DistanceType:
-        logger.info(f"Computing neighbourhood densities using {distance_type.name} distance")
+        try:
+            neighbours_with_distances = the_norms.nearest_neighbours_with_distances(word, n=neighbourhood_size,
+                                                                                    distance_type=distance)
 
-        smds: List[float] = []
-        nearest_words: List[Tuple] = []
-        for i, word in enumerate(wordlist, start=1):
-            print_progress(i, len(wordlist), bar_length=50)
-
-            neighbours_with_distances = the_norms.nearest_neighbours_with_distances(word, n=SMD_N, distance_type=distance_type)
-
-            neighbours: Tuple[str]
+            neighbours: tuple[str, ...]
             distances: array
             neighbours, distances = unzip(neighbours_with_distances)
 
             smds.append(mean(distances))
-            nearest_words.append((word, *neighbours))
 
-        df[f"SMD{SMD_N} ({distance_type.name})"] = smds
+        except WordNotInNormsError:
+            neighbours = []
+            smds.append(nan)
 
-        # Save neighbours file
-        DataFrame(nearest_words, columns=["Word"] + [f"Neighbour {n}" for n in range(1, SMD_N + 1)]).to_csv(
-            path.join(SAVE_DIR, f"{distance_type.name} neighbours.csv"), index=False)
+        nearest_words.append((word, *neighbours))
 
-    # Save SMD file
-    smd_path = Path(SAVE_DIR, f"smd{SMD_N}.csv")
-    with smd_path.open(mode="w") as smd_file:
-        df.to_csv(smd_file, index=False)
-
-
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s | %(levelname)s | %(module)s | %(message)s',
-                        datefmt="%Y-%m-%d %H:%M:%S",
-                        level=logging.INFO)
-    logger.info("Running %s" % " ".join(argv))
-    main()
-    logger.info("Done!")
+    return smds
