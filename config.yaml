@@ -1,0 +1,39 @@
+# Configuration for your system.
+#
+# Note that if you are running on Windows, you will need to double-backslash "escape" the backslashes in paths.
+# For example:
+#   C:\\Users\\cai\\..    instead of the usual    C:\Users\cai\...
+
+
+corpora:
+  # Paths for the location of files relevant to each corpus.
+  #
+  # Each corpus has a path and an index.
+  #
+  #   path: the absolute location of the .corpus file
+  #   index: the absolute location of the .freqdist file
+
+  bnc:
+    path:  "/Volumes/Big Data/corpora/BBC/2 Tokenised/BNC.corpus"
+    index: "/Volumes/Big Data/indices/BNC.freqdist"
+
+  subtitles:
+    path:  "/Volumes/Big Data/corpora/BBC/4 Tokenised/BBC.corpus"
+    index: "/Volumes/Big Data/indexes/BBC.freqdist"
+
+  ukwac:
+    path:  "/Volumes/Big Data/corpora/BBC/3 Tokenised/UKWAC.corpus"
+    index: "/Volumes/Big Data/indices/UKWAC.freqdist"
+
+models:
+  # The directory where all models live.  Within this directory, models must be arranged in the following manner:
+  #
+  #   <directory>/<model-name>/<*model-files>
+  #
+  # So for example if one of your model files is located at:
+  #
+  #   /Volumes/Data/vectors/log_cooccurrence/BBC_r=1_log_cooccurrence.npz
+  #
+  # Then this path must be "/Volumes/Data/vectors", and keeping the model file "BBC_r=1_log_cooccurrence.npz" in a
+  # directory called "log_cooccurrence" is mandatory.
+  directory: "/Volumes/Big Data/vectors"
